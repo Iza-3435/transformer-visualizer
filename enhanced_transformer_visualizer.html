@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transformer Architecture - Visual Learning Journey</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #e5e5e5;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 60px 0;
+            border-bottom: 1px solid #333;
+            background: radial-gradient(ellipse at center, rgba(255,255,255,0.05) 0%, transparent 70%);
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #fff 0%, #ccc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #aaa;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .powered-by {
+            display: inline-block;
+            background: linear-gradient(135deg, #222 0%, #333 100%);
+            border: 1px solid #444;
+            color: #ccc;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        /* Progress Section */
+        .progress-section {
+            background: linear-gradient(135deg, #111 0%, #1a1a1a 100%);
+            border: 1px solid #333;
+            border-radius: 16px;
+            padding: 40px;
+            margin: 40px 0;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .progress-title {
+            font-size: 1.8rem;
+            color: #fff;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .step-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .step-dot {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #222;
+            border: 2px solid #444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            font-size: 1rem;
+        }
+
+        .step-dot::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: -45px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: #ccc;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            font-weight: 500;
+        }
+
+        .step-dot:hover::after {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(-2px);
+            color: #fff;
+        }
+
+        .step-dot:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255,255,255,0.1);
+        }
+
+        .step-dot.active {
+            background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+            color: #000;
+            border-color: #fff;
+            box-shadow: 0 4px 16px rgba(255,255,255,0.2);
+        }
+
+        .step-dot.active::after {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(-2px);
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .step-dot.completed {
+            background: linear-gradient(135deg, #444 0%, #555 100%);
+            color: #fff;
+            border-color: #666;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+            color: #aaa;
+        }
+
+        .progress-bar-container {
+            background: #222;
+            border-radius: 8px;
+            padding: 4px;
+            margin: 25px 0;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #fff 0%, #ddd 100%);
+            height: 8px;
+            border-radius: 4px;
+            transition: width 0.8s ease;
+            box-shadow: 0 2px 4px rgba(255,255,255,0.1);
+        }
+
+        .control-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #222 0%, #333 100%);
+            color: #e5e5e5;
+            border: 1px solid #444;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #333 0%, #444 100%);
+            border-color: #555;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .btn.primary {
+            background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+            color: #000;
+            border-color: #fff;
+        }
+
+        .btn.primary:hover {
+            background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+        }
+
+        /* Learning Sections */
+        .learning-section {
+            background: linear-gradient(135deg, #111 0%, #1a1a1a 100%);
+            border: 1px solid #333;
+            border-radius: 16px;
+            margin: 50px 0;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #1a1a1a 0%, #222 100%);
+            border-bottom: 1px solid #333;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: #aaa;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Video Section */
+        .video-section {
+            padding: 50px;
+            text-align: center;
+            background: #000;
+        }
+
+        .video-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .manim-video {
+            max-width: 85%;
+            max-height: 600px;
+            width: auto;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+        }
+
+        .video-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .video-btn {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #444;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .video-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #666;
+        }
+
+        /* Description Section */
+        .description-section {
+            padding: 50px;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+        }
+
+        .concept-overview {
+            background: linear-gradient(135deg, #1a1a1a 0%, #222 100%);
+            border: 1px solid #333;
+            border-left: 4px solid #fff;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .concept-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+
+        .concept-text {
+            font-size: 1.05rem;
+            line-height: 1.7;
+            color: #e0e0e0;
+        }
+
+        .key-insights {
+            background: linear-gradient(135deg, #0a0a0a 0%, #111 100%);
+            border: 1px solid #444;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .key-insights h4 {
+            color: #fff;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .insight-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .insight-list li {
+            margin: 15px 0;
+            padding-left: 25px;
+            position: relative;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #e5e5e5;
+        }
+
+        .insight-list li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .insight-list strong {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .math-formula {
+            background: #000;
+            border: 1px solid #444;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .math-formula .formula-title {
+            display: block;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            color: #ccc;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-weight: 600;
+        }
+
+        .math-formula .formula {
+            font-size: 1.3rem;
+            color: #fff;
+            margin: 10px 0;
+        }
+
+        .practical-example {
+            background: linear-gradient(135deg, #1a1a1a 0%, #222 100%);
+            border: 1px solid #444;
+            border-left: 4px solid #4CAF50;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .example-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #4CAF50;
+            margin-bottom: 15px;
+        }
+
+        .example-text {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: #e0e0e0;
+        }
+
+        /* Utilities */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .section-header {
+                padding: 30px 20px;
+            }
+
+            .video-section, .description-section {
+                padding: 30px 20px;
+            }
+
+            .step-indicators {
+                gap: 20px;
+            }
+
+            .step-dot {
+                width: 50px;
+                height: 50px;
+                font-size: 0.9rem;
+            }
+
+            .manim-video {
+                max-width: 95%;
+                max-height: 400px;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Navigation arrows */
+        .nav-arrow {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.8);
+            border: 1px solid #444;
+            color: #fff;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .nav-arrow:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .nav-arrow.left {
+            left: 20px;
+        }
+
+        .nav-arrow.right {
+            right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation arrows -->
+    <div class="nav-arrow left" onclick="previousStep()">‹</div>
+    <div class="nav-arrow right" onclick="nextStep()">›</div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Transformer Architecture</h1>
+            <p class="subtitle">Master the revolutionary deep learning architecture through interactive visualizations and step-by-step exploration</p>
+            <div class="powered-by">
+                🎬 <strong>Powered by Manim</strong> • Visual Learning Experience
+            </div>
+        </div>
+
+        <!-- Progress Section -->
+        <div class="progress-section">
+            <h2 class="progress-title">Learning Journey</h2>
+            
+            <div class="step-indicators">
+                <div class="step-dot active" data-step="0" data-label="Tokenization & Embeddings">1</div>
+                <div class="step-dot" data-step="1" data-label="Positional Encoding">2</div>
+                <div class="step-dot" data-step="2" data-label="Multi-Head Attention">3</div>
+                <div class="step-dot" data-step="3" data-label="Encoder Stack">4</div>
+                <div class="step-dot" data-step="4" data-label="Sequential Decoder">5</div>
+            </div>
+            
+            <div class="progress-info">
+                <span>Learning Progress</span>
+                <span id="progressPercent">20%</span>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar" style="width: 20%;"></div>
+            </div>
+            
+            <div class="control-buttons">
+                <button class="btn" onclick="previousStep()">← Previous Step</button>
+                <button class="btn primary" onclick="playVideo()">▶ Play Animation</button>
+                <button class="btn" onclick="nextStep()">Next Step →</button>
+                <button class="btn" onclick="resetProgress()">↻ Reset Journey</button>
+            </div>
+        </div>
+
+        <!-- Step 1: Tokenization & Embeddings -->
+        <div class="learning-section" id="section-0">
+            <div class="section-header">
+                <div class="section-title">Step 1: Tokenization & Embeddings</div>
+                <div class="section-subtitle">Converting human language into numerical representations that computers can understand</div>
+            </div>
+            
+            <div class="video-section">
+                <div class="video-container">
+                    <video class="manim-video" id="video-0" controls loop muted playsinline>
+                        <source src="animations/EnhancedTokenToEmbedding.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                
+                <div class="video-controls">
+                    <button class="video-btn" onclick="restartVideo(0)">↻ Restart</button>
+                    <button class="video-btn" onclick="togglePlay(0)">⏯ Play/Pause</button>
+                </div>
+            </div>
+            
+            <div class="description-section">
+                <div class="concept-overview">
+                    <div class="concept-title">The Foundation of Language Processing</div>
+                    <div class="concept-text">
+                        Every transformer starts here: converting human language into mathematical representations. This two-step process first breaks text into tokens (meaningful pieces), then converts each token into a dense vector that captures its semantic meaning. Think of it as creating a "digital DNA" for each word.
+                    </div>
+                </div>
+
+                <div class="key-insights">
+                    <h4>What You Learn in This Step</h4>
+                    <ul class="insight-list">
+                        <li><strong>Tokenization:</strong> How "Hello world" becomes ["Hello", "world"] pieces</li>
+                        <li><strong>Vocabulary:</strong> Each unique token gets a number ID (like a passport)</li>
+                        <li><strong>Embedding Matrix:</strong> The lookup table that converts IDs to meaningful vectors</li>
+                        <li><strong>Semantic Space:</strong> Why similar words end up close together in vector space</li>
+                        <li><strong>Dense Representation:</strong> From sparse one-hot to rich, learnable vectors</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <div class="example-title">Real-World Connection</div>
+                    <div class="example-text">
+                        When you type "The cat sat on the mat," the transformer doesn't see words—it sees vectors like [0.2, -0.5, 0.8, ...]. These numbers capture everything from "cat" being an animal to "sat" being past tense. The magic is that the model learns these representations from data, discovering patterns we might never notice.
+                    </div>
+                </div>
+
+                <div class="math-formula">
+                    <span class="formula-title">Mathematical Foundation</span>
+                    <div class="formula">Token → ID → Embedding Vector</div>
+                    <div class="formula">E ∈ ℝ^(V×d) where V = vocabulary size, d = embedding dimension</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Positional Encoding -->
+        <div class="learning-section hidden" id="section-1">
+            <div class="section-header">
+                <div class="section-title">Step 2: Positional Encoding</div>
+                <div class="section-subtitle">Teaching the transformer where each word sits in the sentence using mathematical patterns</div>
+            </div>
+            
+            <div class="video-section">
+                <div class="video-container">
+                    <video class="manim-video" id="video-1" controls loop muted playsinline>
+                        <source src="animations/Step3_PositionalEncoding.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                
+                <div class="video-controls">
+                    <button class="video-btn" onclick="restartVideo(1)">↻ Restart</button>
+                    <button class="video-btn" onclick="togglePlay(1)">⏯ Play/Pause</button>
+                </div>
+            </div>
+            
+            <div class="description-section">
+                <div class="concept-overview">
+                    <div class="concept-title">Solving the Word Order Problem</div>
+                    <div class="concept-text">
+                        Unlike humans who read words in sequence, transformers process all words simultaneously. This creates a problem: "Dog bites man" and "Man bites dog" would look identical! Positional encoding solves this by adding unique mathematical signatures to each position, using beautiful sine and cosine wave patterns.
+                    </div>
+                </div>
+
+                <div class="key-insights">
+                    <h4>How Position Becomes Mathematics</h4>
+                    <ul class="insight-list">
+                        <li><strong>The Problem:</strong> Transformers are "bag of words" without position info</li>
+                        <li><strong>Sine/Cosine Waves:</strong> Different frequencies create unique fingerprints for each position</li>
+                        <li><strong>Additive Design:</strong> Position vectors add to word embeddings (no extra dimensions needed)</li>
+                        <li><strong>Relative Distance:</strong> The model can learn relationships like "3 words apart"</li>
+                        <li><strong>Infinite Length:</strong> The pattern works for sentences of any length</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <div class="example-title">The Music of Position</div>
+                    <div class="example-text">
+                        Imagine each word position as a unique chord played by an orchestra. Position 1 might be [high violin, low cello], position 2 might be [medium violin, medium cello]. The sine and cosine functions create these musical patterns that never repeat, giving every position a unique "sound" the transformer can recognize.
+                    </div>
+                </div>
+
+                <div class="math-formula">
+                    <span class="formula-title">The Positional Encoding Formula</span>
+                    <div class="formula">PE(pos, 2i) = sin(pos / 10000^(2i/d_model))</div>
+                    <div class="formula">PE(pos, 2i+1) = cos(pos / 10000^(2i/d_model))</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Multi-Head Attention -->
+        <div class="learning-section hidden" id="section-2">
+            <div class="section-header">
+                <div class="section-title">Step 3: Multi-Head Attention</div>
+                <div class="section-subtitle">The breakthrough mechanism that lets words "look at" and learn from each other</div>
+            </div>
+            
+            <div class="video-section">
+                <div class="video-container">
+                    <video class="manim-video" id="video-2" controls loop muted playsinline>
+                        <source src="animations/Step4_MultiHeadAttention.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                
+                <div class="video-controls">
+                    <button class="video-btn" onclick="restartVideo(2)">↻ Restart</button>
+                    <button class="video-btn" onclick="togglePlay(2)">⏯ Play/Pause</button>
+                </div>
+            </div>
+            
+            <div class="description-section">
+                <div class="concept-overview">
+                    <div class="concept-title">The Heart of the Transformer</div>
+                    <div class="concept-text">
+                        This is where the magic happens. Attention allows each word to "look at" every other word in the sentence and decide what's important. It's like having a conversation where everyone can talk to everyone else simultaneously, with some voices getting more attention than others based on relevance.
+                    </div>
+                </div>
+
+                <div class="key-insights">
+                    <h4>Understanding Attention Mechanics</h4>
+                    <ul class="insight-list">
+                        <li><strong>Query, Key, Value:</strong> Each word asks questions (Q), offers answers (K), and shares content (V)</li>
+                        <li><strong>Attention Weights:</strong> Similarity between queries and keys determines focus</li>
+                        <li><strong>Multiple Heads:</strong> Different "types" of attention (grammar, meaning, relationships) work in parallel</li>
+                        <li><strong>Self-Attention:</strong> Words within the same sentence attending to each other</li>
+                        <li><strong>Parallel Processing:</strong> All attention computed simultaneously, not sequentially</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <div class="example-title">Attention in Action</div>
+                    <div class="example-text">
+                        In "The animal didn't cross the street because it was too tired," the word "it" needs to figure out what it refers to. Through attention, "it" looks at both "animal" and "street," but pays much more attention to "animal" because that makes semantic sense. The model learns these patterns from millions of examples.
+                    </div>
+                </div>
+
+                <div class="math-formula">
+                    <span class="formula-title">Attention Formula</span>
+                    <div class="formula">Attention(Q,K,V) = softmax(QK^T / √d_k)V</div>
+                    <div class="formula">MultiHead = Concat(head₁, head₂, ..., head₈)W^O</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Encoder Stack -->
+        <div class="learning-section hidden" id="section-3">
+            <div class="section-header">
+                <div class="section-title">Step 4: Encoder Stack</div>
+                <div class="section-subtitle">Six layers of deep processing that build increasingly sophisticated understanding</div>
+            </div>
+            
+            <div class="video-section">
+                <div class="video-container">
+                    <video class="manim-video" id="video-3" controls loop muted playsinline>
+                        <source src="animations/Step5_EncoderStack.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                
+                <div class="video-controls">
+                    <button class="video-btn" onclick="restartVideo(3)">↻ Restart</button>
+                    <button class="video-btn" onclick="togglePlay(3)">⏯ Play/Pause</button>
+                </div>
+            </div>
+            
+            <div class="description-section">
+                <div class="concept-overview">
+                    <div class="concept-title">Deep Understanding Through Layered Processing</div>
+                    <div class="concept-text">
+                        Like an onion with many layers, the encoder stack processes information in stages. Each layer builds on the previous one: Layer 1 might notice basic word relationships, Layer 3 might understand phrases, and Layer 6 might grasp complex semantic relationships. It's architectural depth that creates AI understanding.
+                    </div>
+                </div>
+
+                <div class="key-insights">
+                    <h4>How Deep Networks Learn</h4>
+                    <ul class="insight-list">
+                        <li><strong>Layer Hierarchy:</strong> Early layers learn simple patterns, deep layers learn complex concepts</li>
+                        <li><strong>Residual Connections:</strong> Skip connections prevent information loss in deep networks</li>
+                        <li><strong>Layer Normalization:</strong> Keeps the math stable as information flows through layers</li>
+                        <li><strong>Feed-Forward Networks:</strong> Each word gets individually processed between attention layers</li>
+                        <li><strong>Emergent Complexity:</strong> Simple operations repeated create sophisticated understanding</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <div class="example-title">The Cooking Analogy</div>
+                    <div class="example-text">
+                        Think of the encoder like preparing a complex dish. Layer 1 chops the ingredients (basic word features). Layer 2 combines flavors (word relationships). Layer 3 seasons and adjusts (grammatical understanding). Each layer refines the "recipe" until Layer 6 produces a rich, nuanced understanding of the input text.
+                    </div>
+                </div>
+
+                <div class="math-formula">
+                    <span class="formula-title">Encoder Layer Structure</span>
+                    <div class="formula">x' = LayerNorm(x + MultiHeadAttention(x))</div>
+                    <div class="formula">x'' = LayerNorm(x' + FeedForward(x'))</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5: Sequential Decoder -->
+        <div class="learning-section hidden" id="section-4">
+            <div class="section-header">
+                <div class="section-title">Step 5: Sequential Decoder</div>
+                <div class="section-subtitle">Generating output text one word at a time using encoder context and previous words</div>
+            </div>
+            
+            <div class="video-section">
+                <div class="video-container">
+                    <video class="manim-video" id="video-4" controls loop muted playsinline>
+                        <source src="animations/Step6_Decoder.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                
+                <div class="video-controls">
+                    <button class="video-btn" onclick="restartVideo(4)">↻ Restart</button>
+                    <button class="video-btn" onclick="togglePlay(4)">⏯ Play/Pause</button>
+                </div>
+            </div>
+            
+            <div class="description-section">
+                <div class="concept-overview">
+                    <div class="concept-title">The Art of Sequential Generation</div>
+                    <div class="concept-text">
+                        The decoder is where the transformer becomes creative. Unlike the encoder that processes everything at once, the decoder works step by step, generating one word at a time. It's like a skilled translator who reads the entire source sentence, then crafts the translation word by word, always considering both the original text and what they've already written.
+                    </div>
+                </div>
+
+                <div class="key-insights">
+                    <h4>Decoder Mechanics</h4>
+                    <ul class="insight-list">
+                        <li><strong>Autoregressive Generation:</strong> Each new word depends on all previous words</li>
+                        <li><strong>Masked Attention:</strong> During training, can't peek at future words (prevents cheating)</li>
+                        <li><strong>Cross-Attention:</strong> Decoder looks at encoder output to understand source context</li>
+                        <li><strong>Special Tokens:</strong> START and END tokens signal beginning and completion</li>
+                        <li><strong>Probability Distribution:</strong> Each step outputs probabilities for next word</li>
+                    </ul>
+                </div>
+
+                <div class="practical-example">
+                    <div class="example-title">The Generation Flow</div>
+                    <div class="example-text">
+                        When translating "How are you?" to German, the decoder starts with START, then generates "Wie" (looking at "How"), then "geht" (considering both "are" and previous "Wie"), then "es" (using full context), and so on. Each word is informed by both the English source and the German words already generated.
+                    </div>
+                </div>
+
+                <div class="math-formula">
+                    <span class="formula-title">Decoder Architecture</span>
+                    <div class="formula">MaskedAttention(previous outputs) + CrossAttention(encoder) → next word</div>
+                    <div class="formula">P(w_t | w_&lt;t, encoder_output) = softmax(linear(decoder_output))</div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <script>
+        let currentStep = 0;
+        const totalSteps = 5;
+
+        function updateProgress() {
+            const progress = ((currentStep + 1) / totalSteps) * 100;
+            document.getElementById('progressPercent').textContent = Math.round(progress) + '%';
+            document.getElementById('progressBar').style.width = progress + '%';
+            
+            // Update step indicators
+            document.querySelectorAll('.step-dot').forEach((dot, index) => {
+                dot.classList.remove('active', 'completed');
+                if (index === currentStep) {
+                    dot.classList.add('active');
+                } else if (index < currentStep) {
+                    dot.classList.add('completed');
+                }
+            });
+
+            // Update navigation arrows visibility
+            const leftArrow = document.querySelector('.nav-arrow.left');
+            const rightArrow = document.querySelector('.nav-arrow.right');
+            
+            if (leftArrow) leftArrow.style.opacity = currentStep > 0 ? '1' : '0.3';
+            if (rightArrow) rightArrow.style.opacity = currentStep < totalSteps - 1 ? '1' : '0.3';
+        }
+
+        function showSection(stepIndex) {
+            // Hide all sections
+            document.querySelectorAll('.learning-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Show current section with animation
+            const currentSection = document.getElementById(`section-${stepIndex}`);
+            if (currentSection) {
+                currentSection.classList.remove('hidden');
+                currentSection.classList.add('fade-in');
+                
+                // Remove animation class after animation completes
+                setTimeout(() => {
+                    currentSection.classList.remove('fade-in');
+                }, 600);
+            }
+        }
+
+        function nextStep() {
+            if (currentStep < totalSteps - 1) {
+                currentStep++;
+                showSection(currentStep);
+                updateProgress();
+                
+                // Auto-scroll to top of new section
+                document.getElementById(`section-${currentStep}`).scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            }
+        }
+
+        function previousStep() {
+            if (currentStep > 0) {
+                currentStep--;
+                showSection(currentStep);
+                updateProgress();
+                
+                // Auto-scroll to top of new section
+                document.getElementById(`section-${currentStep}`).scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            }
+        }
+
+        function playVideo() {
+            const video = document.getElementById(`video-${currentStep}`);
+            if (video && !video.error) {
+                video.currentTime = 0;
+                video.play().catch(e => {
+                    console.log('Video play failed:', e);
+                    showNotification('Video not available. Please ensure your animation file is properly placed.');
+                });
+            } else {
+                showNotification('Video not found. Please add your Manim animation file.');
+            }
+        }
+
+        function togglePlay(videoIndex) {
+            const video = document.getElementById(`video-${videoIndex}`);
+            if (video && !video.error) {
+                if (video.paused) {
+                    video.play().catch(e => console.log('Video play failed:', e));
+                } else {
+                    video.pause();
+                }
+            }
+        }
+
+        function restartVideo(videoIndex) {
+            const video = document.getElementById(`video-${videoIndex}`);
+            if (video && !video.error) {
+                video.currentTime = 0;
+                video.play().catch(e => console.log('Video restart failed:', e));
+            }
+        }
+
+        function resetProgress() {
+            currentStep = 0;
+            showSection(currentStep);
+            updateProgress();
+            
+            // Scroll to top
+            document.querySelector('.header').scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
+        }
+
+        function showNotification(message) {
+            let notification = document.getElementById('notification');
+            if (!notification) {
+                notification = document.createElement('div');
+                notification.id = 'notification';
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: linear-gradient(135deg, #333 0%, #444 100%);
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: 8px;
+                    border: 1px solid #555;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                    z-index: 1000;
+                    font-size: 0.9rem;
+                    max-width: 350px;
+                    opacity: 0;
+                    transform: translateX(100%);
+                    transition: all 0.3s ease;
+                `;
+                document.body.appendChild(notification);
+            }
+            
+            notification.textContent = message;
+            notification.style.opacity = '1';
+            notification.style.transform = 'translateX(0)';
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(100%)';
+            }, 4000);
+        }
+
+        // Keyboard navigation
+        function handleKeyPress(e) {
+            switch(e.key) {
+                case 'ArrowRight':
+                case ' ':
+                    e.preventDefault();
+                    nextStep();
+                    break;
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    previousStep();
+                    break;
+                case 'Enter':
+                    e.preventDefault();
+                    playVideo();
+                    break;
+                case 'r':
+                case 'R':
+                    if (!e.ctrlKey && !e.metaKey) {
+                        e.preventDefault();
+                        resetProgress();
+                    }
+                    break;
+                case 'Escape':
+                    resetProgress();
+                    break;
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            showSection(currentStep);
+            updateProgress();
+            
+            // Add click handlers to step dots
+            document.querySelectorAll('.step-dot').forEach((dot, index) => {
+                dot.addEventListener('click', () => {
+                    if (index < totalSteps) {
+                        currentStep = index;
+                        showSection(currentStep);
+                        updateProgress();
+                    }
+                });
+            });
+
+            document.addEventListener('keydown', handleKeyPress);
+            
+            setTimeout(() => {
+                showNotification('Welcome! Use arrow keys or buttons to navigate. Press Enter to play videos.');
+            }, 1000);
+        });
+
+        // Handle visibility change to pause videos when tab is not active
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                document.querySelectorAll('video').forEach(video => {
+                    if (!video.paused) {
+                        video.pause();
+                    }
+                });
+            }
+        });
+
+        // Auto-play videos when section becomes active
+        function autoPlayVideo(stepIndex) {
+            setTimeout(() => {
+                const video = document.getElementById(`video-${stepIndex}`);
+                if (video && !video.error) {
+                    video.play().catch(e => console.log('Auto-play failed:', e));
+                }
+            }, 500);
+        }
+    </script>
+</body>
+</html>

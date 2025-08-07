@@ -31,5 +31,5 @@ This visualizer breaks down and animates the following key concepts in the Trans
 
 ### 1. Clone the Repo
 ```bash
-git clone https://github.com/yourusername/transformer-visualizer.git
+git clone https://github.com/Iza-3435/transformer-visualizer.git
 cd transformer-visualizer
